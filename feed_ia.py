@@ -3,10 +3,8 @@ from mlx_lm import load
 from mlx_lm.generate import generate_step
 import mlx.core as mx
 
-# Carrega o modelo e o tokenizer
 model, tokenizer = load("mlx-community/Llama-3.2-3B-Instruct-4bit")
 
-# Carrega os contextos
 directory_path = "txts"
 contextos = []
 
@@ -17,9 +15,8 @@ for filename in os.listdir(directory_path):
             content = f.read().strip()
             contextos.append((filename, content))
 
-print(f"🧠 {len(contextos)} contextos carregados.")
+print(f"{len(contextos)} contextos carregados.")
 
-# Função para usar o modelo e gerar uma resposta com base no prompt
 def gerar_resposta(prompt, max_tokens=256):
     input_tokens = mx.array(tokenizer.encode(prompt))
     output = ""
@@ -27,16 +24,14 @@ def gerar_resposta(prompt, max_tokens=256):
         output += tokenizer.decode([token])
     return output.strip()
 
-# Loop de interação
 while True:
-    pergunta = input("\n❓ Pergunta (ou 'sair' para encerrar): ").strip()
+    pergunta = input("\nPergunta (ou 'sair' para encerrar): ").strip()
     if pergunta.lower() == "sair":
         break
     if not pergunta:
         print("Digite uma pergunta válida.")
         continue
 
-    # Etapa 1: Escolher o contexto mais relevante
     prompt_escolha = "Contextos:\n\n"
     for idx, (_, contexto) in enumerate(contextos, start=1):
         prompt_escolha += f"{idx}. {contexto[:500]}...\n\n"  # corta para não ficar muito grande
@@ -50,15 +45,14 @@ while True:
         if not (1 <= contexto_idx <= len(contextos)):
             raise ValueError
     except ValueError:
-        print("❌ Não foi possível identificar o melhor contexto. Tente novamente.")
+        print(" Não foi possível identificar o melhor contexto. Tente novamente.")
         continue
 
     contexto_escolhido = contextos[contexto_idx - 1][1]
 
-    # Etapa 2: Gerar a resposta final com base no contexto escolhido
     prompt_final = f"{contexto_escolhido}\n\nPergunta: {pergunta}"
     resposta_final = gerar_resposta(prompt_final, max_tokens=256)
 
-    print("\n🤖 Resposta:")
+    print("\n Resposta:")
     print(resposta_final)
     print("-" * 50)
